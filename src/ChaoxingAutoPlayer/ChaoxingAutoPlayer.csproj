@@ -9,6 +9,9 @@
     <RootNamespace>ChaoxingAutoPlayer</RootNamespace>
     <AssemblyName>ChaoxingAutoPlayer</AssemblyName>
     <Version>0.1.4</Version>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <!-- WPF still requires the executable manifest for per-monitor DPI awareness. -->
+    <NoWarn>$(NoWarn);WFAC010</NoWarn>
     <ApplicationIcon>assets\branding\chaoxing-autoplayer.ico</ApplicationIcon>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <SelfContained>true</SelfContained>
