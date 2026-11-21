@@ -1,0 +1,23 @@
+# .NET build output
+**/bin/
+**/obj/
+artifacts/
+publish/
+TestResults/
+*.trx
+
+# IDE and user-specific files
+.vs/
+.idea/
+*.user
+*.suo
+
+# Local runtime state and diagnostics
+*.log
+.env
+.sd-state/
+
+# Operating-system files
+Thumbs.db
+Desktop.ini
+.DS_Store

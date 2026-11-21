@@ -1,0 +1,163 @@
+<Window x:Class="ChaoxingAutoPlayer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+        Title="超星视频连播器"
+        Icon="assets/branding/logo-256.png"
+        Width="1260"
+        Height="820"
+        MinWidth="760"
+        MinHeight="560"
+        Background="#F5F7FB"
+        FontFamily="Microsoft YaHei UI"
+        WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Background="White" BorderBrush="#DDE3EC" BorderThickness="0,0,0,1" Padding="12">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0" Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0"
+                               Text="第一个视频网址"
+                               VerticalAlignment="Center"
+                               Margin="0,0,10,0" />
+                    <TextBox x:Name="UrlBox"
+                             Grid.Column="1"
+                             Height="36"
+                             VerticalContentAlignment="Center"
+                             Padding="9,0"
+                             MinWidth="300"
+                             ToolTip="粘贴任意一个 chaoxing.com 视频学习页；认证参数只保存在本机。" />
+                </Grid>
+
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock x:Name="ModeSummaryText"
+                               Grid.Column="0"
+                               VerticalAlignment="Center"
+                               Foreground="#64748B"
+                               TextTrimming="CharacterEllipsis"
+                               Margin="0,0,12,0" />
+                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                        <Button x:Name="OpenButton"
+                                Content="打开课程"
+                                Padding="14,7"
+                                Click="OpenButton_Click" />
+                        <Button x:Name="ScanButton"
+                                Content="重新扫描"
+                                Padding="14,7"
+                                Margin="8,0,0,0"
+                                Click="ScanButton_Click" />
+                        <Button x:Name="SettingsButton"
+                                Content="设置"
+                                Padding="16,7"
+                                Margin="8,0,0,0"
+                                Click="SettingsButton_Click" />
+                        <Button x:Name="StartButton"
+                                Content="开始连播"
+                                Padding="20,7"
+                                Margin="8,0,0,0"
+                                Click="StartButton_Click" />
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="320" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0"
+                    Margin="12"
+                    Background="White"
+                    BorderBrush="#DDE3EC"
+                    BorderThickness="1"
+                    CornerRadius="8">
+                <wv2:WebView2 x:Name="BrowserView"
+                              MouseEnter="BrowserView_MouseEnter"
+                              MouseLeave="BrowserView_MouseLeave" />
+            </Border>
+
+            <Border Grid.Column="1"
+                    Margin="0,12,12,12"
+                    Background="White"
+                    BorderBrush="#DDE3EC"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="16">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock Text="连播状态"
+                                   FontSize="18"
+                                   FontWeight="SemiBold"
+                                   Foreground="#1E293B"
+                                   Margin="0,0,0,12" />
+                        <TextBlock x:Name="StatusText"
+                                   Text="正在初始化课程浏览器…"
+                                   TextWrapping="Wrap"
+                                   Foreground="#2563EB"
+                                   Margin="0,0,0,14" />
+                        <Button x:Name="QuizActionButton"
+                                Content="尝试处理互动题"
+                                Visibility="Collapsed"
+                                HorizontalAlignment="Left"
+                                Padding="12,6"
+                                Margin="0,0,0,14"
+                                Click="QuizActionButton_Click" />
+                        <TextBlock x:Name="CurrentVideoText"
+                                   Text="当前视频：尚未开始"
+                                   TextWrapping="Wrap"
+                                   Foreground="#334155"
+                                   Margin="0,0,0,8" />
+                        <TextBlock x:Name="ProgressText"
+                                   Text="播放进度：--"
+                                   Foreground="#475569"
+                                   Margin="0,0,0,8" />
+                        <TextBlock x:Name="QueueText"
+                                   Text="视频队列：等待扫描"
+                                   Foreground="#475569"
+                                   Margin="0,0,0,16" />
+                        <TextBlock Text="已跳过的非视频任务"
+                                   FontWeight="SemiBold"
+                                   Foreground="#334155"
+                                   Margin="0,0,0,8" />
+                        <ListBox x:Name="SkippedList"
+                                 MinHeight="120"
+                                 BorderBrush="#E2E8F0"
+                                 Background="#F8FAFC"
+                                 HorizontalContentAlignment="Stretch" />
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+
+        <Border Grid.Row="2"
+                Background="#EEF2F7"
+                BorderBrush="#DDE3EC"
+                BorderThickness="0,1,0,0"
+                Padding="12,8">
+            <TextBlock x:Name="HintText"
+                       Text="程序不会锁定或移动系统鼠标。"
+                       TextWrapping="Wrap"
+                       Foreground="#64748B" />
+        </Border>
+    </Grid>
+</Window>

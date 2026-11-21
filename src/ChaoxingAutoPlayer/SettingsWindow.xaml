@@ -1,0 +1,137 @@
+<Window x:Class="ChaoxingAutoPlayer.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="设置"
+        Icon="assets/branding/logo-256.png"
+        Width="620"
+        Height="500"
+        MinWidth="560"
+        MinHeight="440"
+        Background="#F5F7FB"
+        FontFamily="Microsoft YaHei UI"
+        ResizeMode="CanResize"
+        WindowStartupLocation="CenterOwner">
+    <Grid Margin="18">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="0,0,0,14">
+            <TextBlock Text="设置" FontSize="22" FontWeight="SemiBold" Foreground="#172033" />
+            <TextBlock Text="修改后点击保存；开始/暂停仍在主窗口操作。"
+                       Foreground="#64748B"
+                       Margin="0,5,0,0" />
+        </StackPanel>
+
+        <TabControl Grid.Row="1">
+            <TabItem Header="常规">
+                <StackPanel Margin="16">
+                    <CheckBox x:Name="MuteCheck" Content="默认静音播放" Margin="0,0,0,16" />
+                    <CheckBox x:Name="LockReadyCheck"
+                              Content="SelfDiscipline 全屏锁屏时自动开始连播"
+                              Margin="0,0,0,16" />
+                    <TextBlock Text="锁屏联动只响应 SelfDiscipline 全屏遮罩，不响应 Windows 自带锁屏。"
+                               TextWrapping="Wrap"
+                               Foreground="#64748B" />
+                </StackPanel>
+            </TabItem>
+
+            <TabItem Header="光标">
+                <StackPanel Margin="16">
+                    <RadioButton x:Name="PauseCursorRadio"
+                                 GroupName="CursorMode"
+                                 Content="光标离开网页时暂停，返回后继续"
+                                 Margin="0,0,0,14" />
+                    <RadioButton x:Name="ContinueCursorRadio"
+                                 GroupName="CursorMode"
+                                 Content="光标离开网页仍继续播放"
+                                 Margin="0,0,0,14" />
+                    <TextBlock Text="继续模式会发送网页内部的可信鼠标事件并模拟页面焦点，但不会移动或锁定系统鼠标。"
+                               TextWrapping="Wrap"
+                               Foreground="#64748B" />
+                </StackPanel>
+            </TabItem>
+
+            <TabItem Header="互动题">
+                <StackPanel Margin="16">
+                    <RadioButton x:Name="PauseQuizRadio"
+                                 GroupName="QuizMode"
+                                 Content="暂停并提示，等我点击处理"
+                                 Margin="0,0,0,12"
+                                 Checked="QuizMode_Changed" />
+                    <RadioButton x:Name="AutoQuizRadio"
+                                 GroupName="QuizMode"
+                                 Content="自动选择并提交"
+                                 Margin="0,0,0,16"
+                                 Checked="QuizMode_Changed" />
+
+                    <Grid x:Name="AutoQuizOptions" Margin="24,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="90" />
+                            <ColumnDefinition Width="24" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="90" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0"
+                                   Text="首选第"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,7,10" />
+                        <ComboBox x:Name="PreferredOptionCombo"
+                                  Grid.Row="0" Grid.Column="1"
+                                  Margin="0,0,0,10" />
+                        <TextBlock Grid.Row="0" Grid.Column="2"
+                                   Text="项"
+                                   VerticalAlignment="Center"
+                                   Margin="7,0,0,10" />
+
+                        <TextBlock Grid.Row="1" Grid.Column="0"
+                                   Text="次选第"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,7,10" />
+                        <ComboBox x:Name="SecondaryOptionCombo"
+                                  Grid.Row="1" Grid.Column="1"
+                                  Margin="0,0,0,10" />
+                        <TextBlock Grid.Row="1" Grid.Column="2"
+                                   Text="项"
+                                   VerticalAlignment="Center"
+                                   Margin="7,0,0,10" />
+
+                        <TextBlock Grid.Row="2" Grid.Column="0"
+                                   Text="最多尝试"
+                                   VerticalAlignment="Center" />
+                        <ComboBox x:Name="MaxAttemptsCombo"
+                                  Grid.Row="2" Grid.Column="1" />
+                        <TextBlock Grid.Row="2" Grid.Column="2"
+                                   Text="次"
+                                   VerticalAlignment="Center"
+                                   Margin="7,0,0,0" />
+                    </Grid>
+
+                    <CheckBox x:Name="TryRemainingCheck"
+                              Content="前两项失败后，按页面顺序尝试剩余选项"
+                              Margin="24,0,0,14" />
+
+                    <Border Background="#EEF4FF" BorderBrush="#DBE7FF" BorderThickness="1" CornerRadius="6" Padding="10">
+                        <TextBlock Text="只处理视频播放中弹出的互动题，不处理章节测验、作业或考试。页面已经标记正确选项时会优先按答案标记选择。"
+                                   TextWrapping="Wrap"
+                                   Foreground="#475569" />
+                    </Border>
+                </StackPanel>
+            </TabItem>
+        </TabControl>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+            <Button Content="取消" Width="92" Height="34" Margin="0,0,10,0" IsCancel="True" />
+            <Button Content="保存" Width="92" Height="34" IsDefault="True" Click="SaveButton_Click" />
+        </StackPanel>
+    </Grid>
+</Window>
