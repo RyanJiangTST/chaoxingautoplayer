@@ -21,7 +21,7 @@
 
 ## 项目简介
 
-Chaoxing AutoPlayer 是一个独立的 Windows 桌面程序，不依赖 SelfDiscipline，也不修改超星平台的播放进度接口。程序将课程页面嵌入 WebView2，并在本地完成以下工作：
+Chaoxing AutoPlayer 是一个独立的 Windows 桌面程序，不修改超星平台的播放进度接口。程序将课程页面嵌入 WebView2，并在本地完成以下工作：
 
 - 从课程目录中识别章节和视频任务点；
 - 按顺序播放尚未完成的视频，并在视频结束后切换任务；
