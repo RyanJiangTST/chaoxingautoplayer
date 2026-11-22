@@ -75,6 +75,7 @@ public partial class MainWindow : Window
         _bridge.Blocked += OnBlocked;
         _bridge.QuizDetected += OnQuizDetected;
         _bridge.QuizResolved += OnQuizResolved;
+        _bridge.QuizSkipped += OnQuizSkipped;
         _bridge.QuizWrong += OnQuizWrong;
         _bridge.QuizNeedsAttention += OnQuizNeedsAttention;
         _bridge.NavigationStarting += OnNavigationStarting;
@@ -272,9 +273,13 @@ public partial class MainWindow : Window
 
         var mute = _settings.Muted ? "静音" : "有声";
         var cursor = _continueWithoutCursor ? "光标离开继续" : "光标离开暂停";
-        var quiz = _settings.QuizMode == InteractiveQuizMode.AutoAttempt
-            ? $"互动题 {_settings.PreferredOption}→{_settings.SecondaryOption}→其余"
-            : "互动题暂停提示";
+        var quiz = _settings.QuizMode switch
+        {
+            InteractiveQuizMode.AutoAttempt =>
+                $"互动题 {_settings.PreferredOption}→{_settings.SecondaryOption}→其余",
+            InteractiveQuizMode.Skip => "学习测验自动跳过",
+            _ => "互动题暂停提示",
+        };
         ModeSummaryText.Text = $"{mute} · {cursor} · {quiz}";
     }
 
@@ -533,6 +538,17 @@ public partial class MainWindow : Window
                 $"Interactive quiz detected: type={snapshot.QuestionType}, "
                 + $"options={snapshot.Options.Count}, attempts={_quizAttempts.Count}.");
 
+            if (_settings.QuizMode == InteractiveQuizMode.Skip)
+            {
+                _quizPaused = false;
+                _quizWaitingForResult = true;
+                _automationRunning = true;
+                StatusText.Text = "检测到视频学习测验，正在尝试自动跳过…";
+                AppLog.Info("Learning quiz skip requested.");
+                _bridge.SkipQuiz(_activeQuizFrameId);
+                return;
+            }
+
             if (_settings.QuizMode == InteractiveQuizMode.AutoAttempt && _quizAttempts.Count > 0)
             {
                 _quizPaused = false;
@@ -584,6 +600,24 @@ public partial class MainWindow : Window
         });
     }
 
+    private void OnQuizSkipped(object? sender, string message)
+    {
+        Dispatcher.Invoke(() =>
+        {
+            _quizPaused = false;
+            _quizWaitingForResult = false;
+            _activeQuiz = null;
+            _activeQuizFrameId = string.Empty;
+            _quizAttempts = Array.Empty<InteractiveQuizAttempt>();
+            _quizAttemptIndex = 0;
+            QuizActionButton.Visibility = Visibility.Collapsed;
+            StatusText.Text = message;
+            _automationRunning = true;
+            _bridge.Start(_settings.Muted, 0);
+            AppLog.Info("Interactive quiz skipped.");
+        });
+    }
+
     private void OnQuizWrong(object? sender, string message)
     {
         Dispatcher.Invoke(() =>
@@ -624,6 +658,9 @@ public partial class MainWindow : Window
         _automationRunning = false;
         _bridge.Pause();
         _ = _bridge.SetFocusEmulationAsync(false);
+        QuizActionButton.Content = _settings.QuizMode == InteractiveQuizMode.Skip
+            ? "尝试自动答题"
+            : "尝试处理互动题";
         QuizActionButton.Visibility = Visibility.Visible;
         QuizActionButton.IsEnabled = _activeQuiz is not null;
         StatusText.Text = message;

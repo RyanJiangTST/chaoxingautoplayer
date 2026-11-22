@@ -4,9 +4,9 @@
         Title="设置"
         Icon="assets/branding/logo-256.png"
         Width="620"
-        Height="500"
+        Height="550"
         MinWidth="560"
-        MinHeight="440"
+        MinHeight="500"
         Background="#F5F7FB"
         FontFamily="Microsoft YaHei UI"
         ResizeMode="CanResize"
@@ -63,7 +63,7 @@
                                  Checked="QuizMode_Changed" />
                     <RadioButton x:Name="AutoQuizRadio"
                                  GroupName="QuizMode"
-                                 Content="自动选择并提交"
+                                 Content="自动选择答案并提交"
                                  Margin="0,0,0,16"
                                  Checked="QuizMode_Changed" />
 
@@ -120,8 +120,14 @@
                               Content="前两项失败后，按页面顺序尝试剩余选项"
                               Margin="24,0,0,14" />
 
+                    <RadioButton x:Name="SkipQuizRadio"
+                                 GroupName="QuizMode"
+                                 Content="自动跳过学习测验（不提交答案）"
+                                 Margin="0,0,0,14"
+                                 Checked="QuizMode_Changed" />
+
                     <Border Background="#EEF4FF" BorderBrush="#DBE7FF" BorderThickness="1" CornerRadius="6" Padding="10">
-                        <TextBlock Text="只处理视频播放中弹出的互动题，不处理章节测验、作业或考试。页面已经标记正确选项时会优先按答案标记选择。"
+                        <TextBlock Text="自动跳过仅点击页面提供的关闭/跳过入口，找不到入口时会暂停。只处理视频中弹出的学习测验，不处理章节测验、作业或考试。"
                                    TextWrapping="Wrap"
                                    Foreground="#475569" />
                     </Border>

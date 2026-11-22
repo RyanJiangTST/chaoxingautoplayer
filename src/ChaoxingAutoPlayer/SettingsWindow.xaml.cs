@@ -34,6 +34,7 @@ public partial class SettingsWindow : Window
         ContinueCursorRadio.IsChecked = Settings.CursorBehavior == CursorBehavior.ContinueWithoutCursor;
         PauseQuizRadio.IsChecked = Settings.QuizMode == InteractiveQuizMode.PauseAndPrompt;
         AutoQuizRadio.IsChecked = Settings.QuizMode == InteractiveQuizMode.AutoAttempt;
+        SkipQuizRadio.IsChecked = Settings.QuizMode == InteractiveQuizMode.Skip;
         PreferredOptionCombo.SelectedItem = Settings.PreferredOption;
         SecondaryOptionCombo.SelectedItem = Settings.SecondaryOption;
         TryRemainingCheck.IsChecked = Settings.TryRemainingOptions;
@@ -62,9 +63,11 @@ public partial class SettingsWindow : Window
         Settings.CursorBehavior = ContinueCursorRadio.IsChecked == true
             ? CursorBehavior.ContinueWithoutCursor
             : CursorBehavior.PauseOnLeave;
-        Settings.QuizMode = AutoQuizRadio.IsChecked == true
-            ? InteractiveQuizMode.AutoAttempt
-            : InteractiveQuizMode.PauseAndPrompt;
+        Settings.QuizMode = SkipQuizRadio.IsChecked == true
+            ? InteractiveQuizMode.Skip
+            : AutoQuizRadio.IsChecked == true
+                ? InteractiveQuizMode.AutoAttempt
+                : InteractiveQuizMode.PauseAndPrompt;
         Settings.PreferredOption = PreferredOptionCombo.SelectedItem is int preferred ? preferred : 1;
         Settings.SecondaryOption = SecondaryOptionCombo.SelectedItem is int secondary ? secondary : 2;
         Settings.TryRemainingOptions = TryRemainingCheck.IsChecked == true;

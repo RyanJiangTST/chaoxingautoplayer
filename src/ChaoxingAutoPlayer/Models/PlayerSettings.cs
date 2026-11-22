@@ -10,6 +10,7 @@ public enum InteractiveQuizMode
 {
     PauseAndPrompt,
     AutoAttempt,
+    Skip,
 }
 
 public sealed class PlayerSettings

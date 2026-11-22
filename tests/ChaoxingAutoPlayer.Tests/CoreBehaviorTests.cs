@@ -167,6 +167,26 @@ public class CoreBehaviorTests
     }
 
     [Fact]
+    public void Skip_mode_never_submits_page_marked_answers()
+    {
+        var solver = new PageMetadataQuizSolver();
+        var prompt = new InteractiveQuizPrompt(
+            "测试题",
+            "单选题",
+            new[]
+            {
+                new InteractiveQuizOption(0, "A", false),
+                new InteractiveQuizOption(1, "B", true),
+            });
+
+        var attempts = solver.BuildAttempts(
+            prompt,
+            new PlayerSettings { QuizMode = InteractiveQuizMode.Skip });
+
+        Assert.Empty(attempts);
+    }
+
+    [Fact]
     public void Preferred_secondary_and_remaining_order_is_respected()
     {
         var solver = new PageMetadataQuizSolver();
@@ -253,6 +273,7 @@ public class CoreBehaviorTests
             Assert.False(loaded.Muted);
             Assert.Equal(CursorBehavior.PauseOnLeave, loaded.CursorBehavior);
             Assert.True(loaded.LockReady);
+            Assert.Equal(InteractiveQuizMode.AutoAttempt, loaded.QuizMode);
             Assert.Equal(3, loaded.PreferredOption);
             Assert.Equal(1, loaded.SecondaryOption);
             Assert.False(loaded.TryRemainingOptions);

@@ -75,6 +75,8 @@ public sealed class BrowserBridge : IDisposable
 
     public event EventHandler<string>? QuizResolved;
 
+    public event EventHandler<string>? QuizSkipped;
+
     public event EventHandler<string>? QuizWrong;
 
     public event EventHandler<string>? QuizNeedsAttention;
@@ -163,10 +165,23 @@ public sealed class BrowserBridge : IDisposable
 
     public void ResolveQuiz(string frameId, IReadOnlyList<int> optionIndexes)
     {
+        SendQuizCommand(frameId, "resolveQuiz", optionIndexes);
+    }
+
+    public void SkipQuiz(string frameId)
+    {
+        SendQuizCommand(frameId, "skipQuiz");
+    }
+
+    private void SendQuizCommand(
+        string frameId,
+        string command,
+        IReadOnlyList<int>? optionIndexes = null)
+    {
         var message = JsonSerializer.Serialize(new
         {
             source = "chaoxing-auto-player",
-            command = "resolveQuiz",
+            command,
             optionIndexes,
         });
         var frame = _frameIds
@@ -188,7 +203,7 @@ public sealed class BrowserBridge : IDisposable
         Send(new
         {
             source = "chaoxing-auto-player",
-            command = "resolveQuiz",
+            command,
             optionIndexes,
         });
     }
@@ -440,6 +455,10 @@ public sealed class BrowserBridge : IDisposable
             else if (message.Type == "quizResolved")
             {
                 QuizResolved?.Invoke(this, message.Message ?? "互动题已完成。");
+            }
+            else if (message.Type == "quizSkipped")
+            {
+                QuizSkipped?.Invoke(this, message.Message ?? "学习测验已跳过。");
             }
             else if (message.Type == "quizWrong")
             {

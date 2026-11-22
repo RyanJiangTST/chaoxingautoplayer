@@ -1,5 +1,5 @@
 #define MyAppName "超星视频连播器"
-#define MyAppVersion "0.1.4"
+#define MyAppVersion "0.1.5"
 #define MyAppPublisher "ChaoxingAutoPlayer"
 #define MyAppExeName "ChaoxingAutoPlayer.exe"
 #define MyPortableDir "portable-" + MyAppVersion

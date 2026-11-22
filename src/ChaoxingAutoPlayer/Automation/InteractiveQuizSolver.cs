@@ -12,7 +12,7 @@ public sealed record InteractiveQuizPrompt(
 public sealed record InteractiveQuizAttempt(IReadOnlyList<int> OptionIndexes, string Source);
 
 /// <summary>
-/// Produces ordered answer attempts. Version 0.1.4 uses page metadata and configured option order;
+/// Produces ordered answer attempts. Version 0.1.5 uses page metadata and configured option order;
 /// the future AI build can replace this implementation without changing the browser transport.
 /// </summary>
 public interface IInteractiveQuizSolver
@@ -28,6 +28,11 @@ public sealed class PageMetadataQuizSolver : IInteractiveQuizSolver
         InteractiveQuizPrompt prompt,
         PlayerSettings settings)
     {
+        if (settings.QuizMode == InteractiveQuizMode.Skip)
+        {
+            return Array.Empty<InteractiveQuizAttempt>();
+        }
+
         var marked = prompt.Options
             .Where(option => option.MarkedCorrect)
             .Select(option => option.Index)

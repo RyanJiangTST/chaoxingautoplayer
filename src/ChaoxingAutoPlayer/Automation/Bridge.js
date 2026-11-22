@@ -16,6 +16,7 @@
     playRetryAt: 0,
     quizActive: false,
     quizSubmitting: false,
+    quizSkipping: false,
     quizSubmittedAt: 0,
     quizSignature: "",
     quizOutcomeSignature: ""
@@ -458,8 +459,51 @@
     return { root, options, question, multiple, questionType };
   };
 
+  const quizSignatureFor = quiz =>
+    `${quiz.questionType}|${quiz.question}|${quiz.options.map(option => option.text).join("|")}`;
+
+  const resetQuizState = () => {
+    state.quizActive = false;
+    state.quizSubmitting = false;
+    state.quizSkipping = false;
+    state.quizSubmittedAt = 0;
+    state.quizSignature = "";
+    state.quizOutcomeSignature = "";
+  };
+
+  const findQuizSkipControl = root => {
+    const controls = Array.from(root.querySelectorAll(
+      "a, button, span, i, [role='button']"
+    )).filter(element =>
+      visible(element)
+      && !element.closest(".ans-videoquiz-opt")
+      && !element.matches(
+        ".ans-videoquiz-submit, .ans-videoquiz-back, .ans-videoquiz-continue, "
+        + "#videoquiz-submit, #knowledgeBack, #videoquiz-continue, .continueLearn"
+      )
+    );
+
+    return controls.find(element => {
+      const text = normalize(element.textContent);
+      const marker = normalize([
+        element.id,
+        element.className,
+        element.getAttribute("title"),
+        element.getAttribute("aria-label"),
+        text
+      ].filter(Boolean).join(" "));
+      return /^(关闭|关闭本题|跳过|跳过本题|×|✕|x)$/i.test(text)
+        || /(?:^|[\s_-])(close|skip)(?:$|[\s_-])/i.test(marker)
+        || /关闭|跳过/i.test(marker);
+    }) || null;
+  };
+
   const detectQuiz = () => {
     if (!state.running) {
+      return;
+    }
+
+    if (state.quizSkipping) {
       return;
     }
 
@@ -507,13 +551,14 @@
       return;
     }
 
-    const signature = `${quiz.questionType}|${quiz.question}|${quiz.options.map(option => option.text).join("|")}`;
+    const signature = quizSignatureFor(quiz);
     if (state.quizActive && state.quizSignature === signature) {
       return;
     }
 
     state.quizActive = true;
     state.quizSubmitting = false;
+    state.quizSkipping = false;
     state.quizSignature = signature;
     state.quizOutcomeSignature = "";
     const video = currentVideo();
@@ -565,15 +610,61 @@
     }
 
     state.quizSubmitting = true;
+    state.quizSkipping = false;
     state.quizSubmittedAt = Date.now();
     state.quizOutcomeSignature = "";
     submit.click();
+  };
+
+  const skipQuiz = () => {
+    const quiz = readQuiz();
+    if (!quiz) {
+      resetQuizState();
+      post("quizSkipped", { message: "学习测验已关闭，继续播放。" });
+      playCurrent();
+      return;
+    }
+
+    const control = findQuizSkipControl(quiz.root);
+    if (!control) {
+      post("quizNeedsAttention", {
+        message: "当前学习测验没有可识别的“关闭/跳过”入口，请手动处理或切换为自动作答。"
+      });
+      return;
+    }
+
+    const signature = quizSignatureFor(quiz);
+    state.quizSkipping = true;
+    try {
+      control.click();
+    } catch {
+      state.quizSkipping = false;
+      post("quizNeedsAttention", { message: "点击学习测验的跳过入口失败，请手动处理。" });
+      return;
+    }
+
+    setTimeout(() => {
+      const remaining = readQuiz();
+      const sameQuiz = Boolean(remaining && quizSignatureFor(remaining) === signature);
+      state.quizSkipping = false;
+      if (!sameQuiz) {
+        resetQuizState();
+        post("quizSkipped", { message: "已自动跳过学习测验，继续播放。" });
+        playCurrent();
+        return;
+      }
+
+      post("quizNeedsAttention", {
+        message: "学习测验未能自动关闭，请手动处理或切换为自动作答。"
+      });
+    }, 1200);
   };
 
   window.__cxapProbe = () => ({
     running: state.running,
     quizActive: state.quizActive,
     quizSubmitting: state.quizSubmitting,
+    quizSkipping: state.quizSkipping,
     quizSignature: state.quizSignature
   });
   window.__cxapQuizProbe = () => {
@@ -642,6 +733,9 @@
         break;
       case "resolveQuiz":
         resolveQuiz(message.optionIndexes);
+        break;
+      case "skipQuiz":
+        skipQuiz();
         break;
       case "setMuted":
         state.muted = Boolean(message.muted);
